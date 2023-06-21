@@ -10,7 +10,7 @@
  * Edited by: Craig Hammond
  * Last Updated: 6/13/2012
  */
-package highscores;
+package me.craighammond.face_invaders.highscores;
 
 import java.io.Serializable;
 

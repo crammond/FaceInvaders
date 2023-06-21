@@ -1,3 +1,4 @@
+package me.craighammond.face_invaders;
 /*
  * GameImageSet.java
  * 

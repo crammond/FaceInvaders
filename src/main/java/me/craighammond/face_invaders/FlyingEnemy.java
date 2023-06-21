@@ -1,3 +1,5 @@
+package me.craighammond.face_invaders;
+
 /*
  * FlyingEnemy.java
  * 

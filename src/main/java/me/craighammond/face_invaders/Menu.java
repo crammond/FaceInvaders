@@ -1,3 +1,4 @@
+package me.craighammond.face_invaders;
 /*
  * Menu.java
  * 
@@ -7,7 +8,6 @@
  * Author: Craig Hammond
  * Last Updated: 6/13/2012
  */
-import highscores.HighscoreManager;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+
+import me.craighammond.face_invaders.highscores.HighscoreManager;
 
 public class Menu implements KeyListener, Runnable {
 	// Applet Windo Size

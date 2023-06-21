@@ -1,3 +1,5 @@
+package me.craighammond.face_invaders;
+
 import java.awt.Color;
 import java.awt.Graphics;
 
