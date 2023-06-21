@@ -7,6 +7,7 @@ package me.craighammond.face_invaders;
  * Author: Craig Hammond
  * Last Updated: 6/13/2012
  */
+import javax.swing.*;
 import java.applet.Applet;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -16,8 +17,8 @@ import java.io.IOException;
 
 public class SpaceGameDriver extends Applet implements Runnable {
 	//Applet Window Size
-	private final int X_MAX = 800;
-	private final int Y_MAX = 500;
+	private static final int X_MAX = 800;
+	private static final int Y_MAX = 500;
 	//Game Menu
 	private Menu menu;
 	//booleans for keyListeners
@@ -36,7 +37,7 @@ public class SpaceGameDriver extends Applet implements Runnable {
 
 	public void init() {
 		// Screen Size
-		setSize(X_MAX, Y_MAX);
+		this.setSize(X_MAX, Y_MAX);
 		
 		// menu
 		try {
@@ -63,22 +64,38 @@ public class SpaceGameDriver extends Applet implements Runnable {
 
 	}
 
+	public static void main(String[] args) {
+		SpaceGameDriver game = new SpaceGameDriver();
+		game.setPreferredSize(new Dimension(X_MAX, Y_MAX));
+
+		JFrame jframe = new JFrame("Face Invaders");
+		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		jframe.add(game);
+		jframe.pack();
+		jframe.setResizable(false);
+		jframe.setVisible(true);
+
+		game.init();
+	}
+
 	public void paint(Graphics h) {
-		// Double Buffer
-		g.clearRect(0, 0, (int) this.getWidth(), (int) this.getHeight());
-		// Double Buffer End
+		if (g != null) {
+			// Double Buffer
+			g.clearRect(0, 0, (int) this.getWidth(), (int) this.getHeight());
+			// Double Buffer End
 
-		//draw menu if the game is not playing
-		if (menu.getGame() == null) {
-			menu.draw(g);
+			//draw menu if the game is not playing
+			if (menu.getGame() == null) {
+				menu.draw(g);
+			}
+			//else draws the game
+			else menu.getGame().drawGame(g);
+
+
+			// Double Buffer
+			h.drawImage(offscreen, 0, 0, this);
+			// Double Buffer End
 		}
-		//else draws the game
-		else menu.getGame().drawGame(g);
-		
-
-		// Double Buffer
-		h.drawImage(offscreen, 0, 0, this);
-		// Double Buffer End
 
 		try {
 			Thread.sleep(1);
