@@ -177,7 +177,7 @@ public class Menu implements KeyListener, Runnable {
 		g.setFont(mainMenuFontsmall);
 		g.setColor(fontColor);
 		//(c) Craig Hammond
-		g.drawString("� Craig Hammond, 2012", 10, 490);
+		g.drawString("© Craig Hammond, 2012", 10, 490);
 		// selection directions
 		int littleDirectionsX = 585;
 		g.drawString("Up and Down Arrow Keys to change", littleDirectionsX, 20);
