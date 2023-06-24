@@ -97,12 +97,12 @@ public class GameImageSet {
 		
 		public GameImages(){
 			try {
-				regShip = ImageIO.read(getClass().getResourceAsStream("SpaceShipGIF.gif"));
-				regEnemy = ImageIO.read(getClass().getResourceAsStream("SpaceGameEnemyGIF.gif"));
-				regEnemyBullet = ImageIO.read(getClass().getResourceAsStream("EnemyBulletGIF.gif"));
-				regShipBullet = ImageIO.read(getClass().getResourceAsStream("SpaceShipBulletGIF.gif"));
-				regBackground = ImageIO.read(getClass().getResourceAsStream("starbg.jpg"));
-				regFlyingEnemy = ImageIO.read(getClass().getResourceAsStream("FlyingEnemyGIF.gif"));
+				regShip = ImageIO.read(getClass().getResourceAsStream("/SpaceShipGIF.gif"));
+				regEnemy = ImageIO.read(getClass().getResourceAsStream("/SpaceGameEnemyGIF.gif"));
+				regEnemyBullet = ImageIO.read(getClass().getResourceAsStream("/EnemyBulletGIF.gif"));
+				regShipBullet = ImageIO.read(getClass().getResourceAsStream("/SpaceShipBulletGIF.gif"));
+				regBackground = ImageIO.read(getClass().getResourceAsStream("/starbg.jpg"));
+				regFlyingEnemy = ImageIO.read(getClass().getResourceAsStream("/FlyingEnemyGIF.gif"));
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

@@ -76,7 +76,7 @@ public class SpaceShip extends Thread implements KeyListener{
 		width = w;
 		
 		//sets the audio for shoot to a short laser beam sound
-		shotAudio = Applet.newAudioClip(getClass().getResource("Photonshot.wav"));
+		shotAudio = Applet.newAudioClip(getClass().getResource("/Photonshot.wav"));
 	
 		shipFireWait = SHIP_FIRE_WAIT_TIME;
 		

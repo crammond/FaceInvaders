@@ -73,9 +73,9 @@ public class Menu implements KeyListener, Runnable {
 	private final Font mainMenuFontsmall = new Font("Maiandra GD", Font.PLAIN, 12);
 	
 	public Menu(ArrayList<GameImageSet> imageSets) throws IOException {
-		background = ImageIO.read(getClass().getResourceAsStream("MainMenubg.jpg"));
+		background = ImageIO.read(getClass().getResourceAsStream("/MainMenubg.jpg"));
 		ship = (new GameImageSet()).getRegularShip();
-		starbg = ImageIO.read(getClass().getResourceAsStream("starbg.jpg"));
+		starbg = ImageIO.read(getClass().getResourceAsStream("/starbg.jpg"));
 		
 		//sets the user currently at the first
 		//option, which is to start the game
@@ -177,7 +177,7 @@ public class Menu implements KeyListener, Runnable {
 		g.setFont(mainMenuFontsmall);
 		g.setColor(fontColor);
 		//(c) Craig Hammond
-		g.drawString("© Craig Hammond, 2012", 10, 490);
+		g.drawString("ï¿½ Craig Hammond, 2012", 10, 490);
 		// selection directions
 		int littleDirectionsX = 585;
 		g.drawString("Up and Down Arrow Keys to change", littleDirectionsX, 20);

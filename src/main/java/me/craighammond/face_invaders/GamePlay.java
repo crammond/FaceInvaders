@@ -122,7 +122,7 @@ public class GamePlay extends Thread {
 		enemyBulletImage = images.enemyBullet();
 		backgroundImage = images.Space();
 		//gets the explosion noise
-		boom = Applet.newAudioClip(getClass().getResource("shortBoom.wav"));
+		boom = Applet.newAudioClip(getClass().getResource("/shortBoom.wav"));
 		
 		//sets the background image values
 		backgroundImageY = 0;
