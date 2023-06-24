@@ -1,49 +1,30 @@
-/*
- * HighscoreManager.java
- * 
- * Manages a list of highscores
- * 
- * Author: Unknown
- * Edited by: Craig Hammond
- * Last Updated: 6/13/2012
- */
 package me.craighammond.face_invaders.highscores;
 
 import java.util.*;
 import java.io.*;
 
 public class HighscoreManager {
-	// An arraylist of the type "score" we will use to work with the scores
-	// inside the class
 	private ArrayList<Score> scores;
+	private static final int SCORES_SIZE = 10;
 
-	// The name of the file where the highscores will be saved
-	private static final String HIGHSCORE_FILE = "scores.dat";
-
-	// Initialising an in and outputStream for working with the file
-	ObjectOutputStream outputStream = null;
-	ObjectInputStream inputStream = null;
+	private static final String HIGHSCORE_FILE = "scores.txt";
 
 	public HighscoreManager() {
-		// initialising the scores-arraylist
-		scores = new ArrayList<Score>();
+		scores = new ArrayList<>(SCORES_SIZE);
 	}
-	
-	// Getters
+
 	public ArrayList<Score> getScores() {
 		loadScoreFile();
 		sort();
 		return scores;
 	}
-	//end Getters
 	
 	/**
 	 * sorts the scores from best to worst
 	 */
 	private void sort() {
-		ScoreComparator comparator = new ScoreComparator();
-		Collections.sort(scores, comparator);
-	}//end sort
+		scores.sort(new ScoreComparator());
+	}
 
 	/**
 	 * adds a Score to the list
@@ -55,37 +36,37 @@ public class HighscoreManager {
 		loadScoreFile();
 		scores.add(new Score(name, score));
 		sort();
-		int desiredLength = 10;
-		if(scores.size()>desiredLength){
-			for(int i = scores.size()-1; i>desiredLength-1; i--)
-				scores.remove(i) ;//end for
-		}//end if
+		if(scores.size()>SCORES_SIZE){
+			scores.subList(SCORES_SIZE, scores.size()).clear();
+		}
 		updateScoreFile();
-	}//end addScore
+	}
 
 	/**
 	 * loads the file with the highscores
 	 */
 	public void loadScoreFile() {
-		try {
-			inputStream = new ObjectInputStream(new FileInputStream(
-					HIGHSCORE_FILE));
-			scores = (ArrayList<Score>) inputStream.readObject();
-		} catch (FileNotFoundException e) {
-//			System.out.println("[Load] FNF Error: " + e.getMessage());
-		} catch (IOException e) {
-//			System.out.println("[Load] IO Error: " + e.getMessage());
-		} catch (ClassNotFoundException e) {
-//			System.out.println("[Load] CNF Error: " + e.getMessage());
-		} finally {
-			try {
-				if (outputStream != null) {
-					outputStream.flush();
-					outputStream.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(HIGHSCORE_FILE))) {
+			String line;
+			scores = new ArrayList<>();
+			while ((line = reader.readLine()) != null) {
+				if (line.equals("")) continue;
+				String[] split = line.split(",");
+				if (split.length < 2) {
+					scores.clear();
+					break;
 				}
-			} catch (IOException e) {
-//				System.out.println("[Load] IO Error: " + e.getMessage());
+				int score;
+				try {
+					score = Integer.parseInt(split[1]);
+				} catch (NumberFormatException ignored) {
+					scores.clear();
+					break;
+				}
+				scores.add(new Score(split[0], score));
 			}
+		} catch (IOException e) {
+			scores = new ArrayList<>();
 		}
 	}
 
@@ -93,24 +74,10 @@ public class HighscoreManager {
 	 * updates the file with the most current highscores
 	 */
 	public void updateScoreFile() {
-		try {
-			outputStream = new ObjectOutputStream(new FileOutputStream(
-					HIGHSCORE_FILE));
-			outputStream.writeObject(scores);
-		} catch (FileNotFoundException e) {
-//			System.out.println("[Update] FNF Error: " + e.getMessage()
-//					+ ",the program will try and make a new file");
-		} catch (IOException e) {
-//			System.out.println("[Update] IO Error: " + e.getMessage());
-		} finally {
-			try {
-				if (outputStream != null) {
-					outputStream.flush();
-					outputStream.close();
-				}
-			} catch (IOException e) {
-//				System.out.println("[Update] Error: " + e.getMessage());
+		try (Writer writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE, false))) {
+			for (Score score : scores.subList(0, SCORES_SIZE)) {
+				writer.write(String.format("%s,%d\n", score.getName(), score.getScore()));
 			}
-		}
-	}//end updateScoreFile
-}//end HighscoreManager
+		} catch (IOException ignored) {}
+	}
+}

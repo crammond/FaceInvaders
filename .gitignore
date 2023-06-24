@@ -1,5 +1,5 @@
 # game highscores, currently just dropped at project root
-scores.dat
+scores.txt
 
 # compile target
 /target
