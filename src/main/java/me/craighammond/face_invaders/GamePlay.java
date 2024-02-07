@@ -15,7 +15,6 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
@@ -155,7 +154,7 @@ public class GamePlay extends Thread {
 
 		level = 1;// starts at level 1
 
-		setEnemies();//sets all the enemies
+		handleNoEnemiesPresent();//sets all the enemies
 		
 		//the run method is going
 		keepRunning = true;
@@ -187,56 +186,47 @@ public class GamePlay extends Thread {
 
 	// End Getters
 
-	/**
-	 * Fills the enemies ArrayList
-	 */
-	private void setEnemies() {
-		// prevents ship from shooting while enemies are still respawning
-		if (enemies.size() == 0) {
+	private void handleNoEnemiesPresent() {
+		if (enemies.isEmpty()) {
+
+			// prevents ship from shooting while enemies are still respawning
 			if (spaceship != null) {
 				spaceship.stopShooting();
 			}
 
-			// Doesn't wait the first time
+			// Waits 1 second every level but the first
 			if (firstTime) {
-				for (int row = 0; row < NUM_ENEMY_ROWS; row++) {
-					for (int col = 0; col < NUM_ENEMY_COLS; col++) {
-						enemies.add(new Enemy(ENEMY_GROUP_X + col
-								* GROUP_COLUMN_WITDH, ENEMY_GROUP_Y + row
-								* GROUP_ROW_HEIGHT, ENEMY_WIDTH, ENEMY_HEIGHT,
-								enemyImage, enemyBulletImage));
-					}// end for
-				}// end for
+				populateEnemiesList();
 				firstTime = false;
-			}// end if
+			} else if (enemiesRespawnWait == 1000) {
+				level++;
+				populateEnemiesList();
+				enemiesRespawnWait = 0;
+				enemiesFireWait = 0;
+			} else {
+				enemiesRespawnWait++;
+			}
+		}
+	}
 
-			// Waits 1 second every time but the first
-			else {
-
-				if (enemiesRespawnWait == 1000) {
-					level++;
-					for (int row = 0; row < NUM_ENEMY_ROWS; row++) {
-						for (int col = 0; col < NUM_ENEMY_COLS; col++) {
-							enemies
-									.add(new Enemy(ENEMY_GROUP_X + col
-											* GROUP_COLUMN_WITDH, ENEMY_GROUP_Y
-											+ row * GROUP_ROW_HEIGHT,
-											ENEMY_WIDTH, ENEMY_HEIGHT,
-											enemyImage, enemyBulletImage));
-
-						}// end for
-					}// end for
-
-					enemiesRespawnWait = 0;
-					enemiesFireWait = 0;
-				}// end if
-
-				else 
-					enemiesRespawnWait++;
-
-			}// end else
-		}// end if
-	}// end setEnemies
+	/**
+	 * Fills the enemies ArrayList
+	 */
+	private void populateEnemiesList() {
+		for (int row = 0; row < NUM_ENEMY_ROWS; row++) {
+			for (int col = 0; col < NUM_ENEMY_COLS; col++) {
+				Enemy enemy = new Enemy(
+						ENEMY_GROUP_X + col * GROUP_COLUMN_WITDH,
+						ENEMY_GROUP_Y + row * GROUP_ROW_HEIGHT,
+						ENEMY_WIDTH,
+						ENEMY_HEIGHT,
+						enemyImage,
+						enemyBulletImage
+				);
+				enemies.add(enemy);
+			}
+		}
+	}
 
 	/**
 	 * Draws the entire game
@@ -693,7 +683,7 @@ public class GamePlay extends Thread {
 
 			createNewShip();
 
-			setEnemies();
+			handleNoEnemiesPresent();
 			
 			removeExplosions();
 
