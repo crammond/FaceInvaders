@@ -19,6 +19,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GamePlay extends Thread {
 	// Applet Constants
@@ -234,61 +235,52 @@ public class GamePlay extends Thread {
 	 * @param g
 	 */
 	public void drawGame(Graphics g) {
-		// Background
-		g.drawImage(backgroundImage, 0, 0 + backgroundImageY, X_MAX, Y_MAX,
-				null);
-		g.drawImage(backgroundImage, 0, -Y_MAX + backgroundImageY, X_MAX,
-				Y_MAX, null);
+		// Background (one drawn on screen, one drawn above, in order to perform scroll effect)
+		g.drawImage(backgroundImage, 0, backgroundImageY,           X_MAX, Y_MAX, null);
+		g.drawImage(backgroundImage, 0,backgroundImageY - Y_MAX, X_MAX, Y_MAX, null);
 
-		// spaceship
+		// spaceship and its bullets
 		if (spaceship != null) {
 			spaceship.draw(g);
+			List<Bullet> spaceshipBullets = spaceship.getBullets();
+			if (spaceshipBullets != null) {
+				for (Bullet spaceshipBullet : spaceshipBullets) {
+					spaceshipBullet.draw(g);
+				}
+			}
 		}
 
-		// spaceship bullets
-		if (spaceship != null) {
-			for (int i = 0; i < spaceship.getBullets().size(); i++) {
-				if (spaceship != null && spaceship.getBullets().get(i) != null) {
-					spaceship.getBullets().get(i).draw(g);
-				}//end if
-			}//end for
-		}//end if
-
 		// saved spaceship bullets (from dead ship)
-		for (int i = 0; i < savedShipBullets.size(); i++) {
-			if(savedShipBullets.get(i)!=null)
-				savedShipBullets.get(i).draw(g);
-		}//end for
+        for (Bullet savedShipBullet : savedShipBullets) {
+            if (savedShipBullet != null) savedShipBullet.draw(g);
+        }
 
-		// enemies
-		for (int i = 0; i < enemies.size(); i++) {
-			if(enemies.get(i)!=null)
-				enemies.get(i).draw(g);
-		}//end for
-
-		// enemy bullets
-		for (int i = 0; i < enemies.size(); i++) {
-			if (enemies.get(i) != null && enemies.get(i).getBullet() != null) {
-				enemies.get(i).getBullet().draw(g);
-			}//end if
-		}//end for
+		// enemies and their bullets
+        for (Enemy enemy : enemies) {
+            if (enemy != null) {
+				enemy.draw(g);
+				Bullet enemyBullet = enemy.getBullet();
+				if (enemyBullet != null) {
+					enemyBullet.draw(g);
+				}
+			}
+        }
 
 		// saved enemy bullets (those from dead enemies)
-		for (int i = 0; i < savedEnemyBullets.size(); i++) {
-			if(savedEnemyBullets.get(i)!=null)
-				savedEnemyBullets.get(i).draw(g);
-		}//end for
+        for (Bullet savedEnemyBullet : savedEnemyBullets) {
+            if (savedEnemyBullet != null) savedEnemyBullet.draw(g);
+        }
 		
 		// explosions
-		for (int i = 0; i < explosions.size(); i++) {
-			if(explosions.get(i)!=null)
-				explosions.get(i).draw(g);
-		}//end for
+        for (Explosion explosion : explosions) {
+            if (explosion != null) explosion.draw(g);
+        }
 		
 		// Score
+		int halfXMax = X_MAX / 2;
 		g.setColor(Color.white);
-		g.drawString("SCORE", (int) (X_MAX / 2.0), 20);
-		g.drawString("" + score, (int) (X_MAX / 2.0), 40);
+		g.drawString("SCORE", halfXMax, 20);
+		g.drawString("" + score, halfXMax, 40);
 
 		// Life counter
 		drawLives(g);
@@ -296,7 +288,7 @@ public class GamePlay extends Thread {
 		// Level
 		g.drawString("Level: " + level, 700, 40);
 
-	}//end drawGame
+	}
 
 	/**
 	 * Controls background movement
