@@ -75,7 +75,7 @@ public class HighscoreManager {
 	 */
 	public void updateScoreFile() {
 		try (Writer writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE, false))) {
-			for (Score score : scores.subList(0, SCORES_SIZE)) {
+			for (Score score : scores.subList(0, Integer.min(scores.size(), SCORES_SIZE))) {
 				writer.write(String.format("%s,%d\n", score.getName(), score.getScore()));
 			}
 		} catch (IOException ignored) {}
