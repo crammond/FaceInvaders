@@ -405,134 +405,83 @@ public class GamePlay extends Thread {
 	 * Checks to see if an enemy bullet hit the ship
 	 */
 	private void checkForShipCollisions() {
-		// Checks Enemy Bullets
-		for (int i = 0; i < enemies.size(); i++) {
-			if (enemies.get(i).getBullet() != null && spaceship != null
-					&& enemies.get(i).getBullet().hits(spaceship)) {
-				if(enemies.get(i)!=null&&enemies.get(i).getBullet()!=null){
-					explosions.add(new Explosion(enemies.get(i).getBullet().getX(),
-							enemies.get(i).getBullet().getY()+Bullet.HEIGHT));
-				}//end if
-				enemies.get(i).makeBulletNull();
-				setSavedShipBullets();
-				boom.play();
-				spaceship.stopRunning();
-				spaceship = null;
+		if (spaceship == null) return;
 
-			}// end if
+		for (Enemy enemy : enemies) {
+			if (enemy == null) continue;
+			Bullet enemyBullet = enemy.getBullet();
+			if (handleShipCollisionForBullet(enemyBullet)) {
+				enemy.makeBulletNull();
+				break;
+			};
+		}
 
-		}// end for
+		if (spaceship == null) return;
 
-		// Checks saved Enemy Bullets
 		for (int i = 0; i < savedEnemyBullets.size(); i++) {
-			if (spaceship != null && savedEnemyBullets.get(i).hits(spaceship)) {
-				if(savedEnemyBullets.get(i)!=null){
-					explosions.add(new Explosion(savedEnemyBullets.get(i).getX(),
-							savedEnemyBullets.get(i).getX()+Bullet.HEIGHT));
-				}//end if
-				savedEnemyBullets.get(i).stopRunning();
+			Bullet enemyBullet = savedEnemyBullets.get(i);
+			if (handleShipCollisionForBullet(enemyBullet)) {
+				enemyBullet.stopRunning();
 				savedEnemyBullets.remove(i);
-				setSavedShipBullets();
-				boom.play();
-				spaceship.stopRunning();
-				spaceship = null;
+				break;
+			}
+		}
+	}
 
-			}// end if
-
-		}// end for
-	}// end checkForShipCollisions
+	private boolean handleShipCollisionForBullet(Bullet enemyBullet) {
+		if (spaceship != null && enemyBullet != null && enemyBullet.hits(spaceship)) {
+			explosions.add(new Explosion(enemyBullet.getX(), enemyBullet.getY() + Bullet.HEIGHT));
+			setSavedShipBullets();
+			boom.play();
+			spaceship.stopRunning();
+			spaceship = null;
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Checks to see if the spaceship bullet hit any enemy
 	 */
 	private void checkForEnemyCollisions() {
+		if (spaceship != null) {
+			handleEnemyCollisionsForBullets(spaceship.getBullets());
+		}
+		handleEnemyCollisionsForBullets(savedShipBullets);
+
+	}
+
+	private void handleEnemyCollisionsForBullets(List<Bullet> spaceshipBullets) {
 		//adds a life if the score is goes past a multiple of 20000
 		int addLife = 20000;
 
-		// Checks ship bullets
-		if (spaceship != null) {
-			int s = 0;
-			while (s < spaceship.getBullets().size()) {
-				int e = 0;
-				boolean hit = false;
-				while (e < enemies.size() && hit == false) {
-					if (spaceship.getBullets().get(s).hits(enemies.get(e))) {
-						if (enemies.get(e).getBullet() != null) {
-							savedEnemyBullets.add(enemies.get(e).getBullet());
-						}// end if
-						int scoreBefore = score;
-						score += enemies.get(e).getPoints() * level;
-						int i = scoreBefore;
-						boolean found = false;
-						while (i < score && found == false) {
-							if (i % addLife == 0 && scoreBefore != 0) {
-								numExtraShips++;
-								found = true;
-							}//end if
-							else
-								i++;
-						}//end while
-						boom.play();
-						if(spaceship!=null&&spaceship.getBullets().get(s)!=null){
-						explosions.add(new Explosion(spaceship.getBullets().get(s).getX(),
-								spaceship.getBullets().get(s).getY()));
-						}//end if
-						enemies.get(e).stopRunning();
-						enemies.remove(e);
-						spaceship.getBullets().get(s).stopRunning();
-						spaceship.getBullets().remove(s);
-						hit = true;
-						s--;
-						e++;
-					}// end of
-					e++;
-				}
-				s++;
-			}// end while
-
-		}// end if (spaceship bullets)
-
-		// checks saved ship bullets (from dead ship)
-		int s = 0;
-		while (s < savedShipBullets.size()) {
-			int e = 0;
-			boolean hit = false;
-			while (e < enemies.size() && hit == false) {
-				if (savedShipBullets.get(s).hits(enemies.get(e))) {
-					if (enemies.get(e).getBullet() != null) {
-						savedEnemyBullets.add(enemies.get(e).getBullet());
-					}// end if
+		for (int bulletsIndex = 0; bulletsIndex < spaceshipBullets.size(); bulletsIndex++) {
+			Bullet spaceshipBullet = spaceshipBullets.get(bulletsIndex);
+			if (spaceshipBullet == null) continue;
+			for (int enemiesIndex = 0; enemiesIndex < enemies.size(); enemiesIndex++) {
+				Enemy enemy = enemies.get(enemiesIndex);
+				if (spaceshipBullet.hits(enemy)) {
+					Bullet enemyBullet = enemy.getBullet();
+					if (enemyBullet != null) {
+						savedEnemyBullets.add(enemyBullet);
+					}
 					int scoreBefore = score;
-					score += enemies.get(e).getPoints() * level;
-					int i = scoreBefore;
-					boolean found = false;
-					while (i < score && found == false) {
-						if (i % addLife == 0 && scoreBefore != 0) {
-							numExtraShips++;
-							found = true;
-						} //end if
-						else
-							i++;
-					}//end while
+					score += enemy.getPoints() * level;
+					if (((score % addLife) - (scoreBefore % addLife)) > addLife) {
+						numExtraShips++;
+					}
 					boom.play();
-					if(spaceship!=null&&spaceship.getBullets().get(s)!=null){
-					explosions.add(new Explosion(spaceship.getBullets().get(s).getX(),
-							spaceship.getBullets().get(s).getY()));
-					}//end if
-					enemies.get(e).stopRunning();
-					enemies.remove(e);
-					savedShipBullets.get(s).stopRunning();
-					savedShipBullets.remove(s);
-					hit = true;
-					s--;
-					e++;
-				}// end if
-				e++;
-			}// endd while
-			s++;
-		}// end while
-
-	}// end checkForEnemyCollisions
+					explosions.add(new Explosion(spaceshipBullet.getX(), spaceshipBullet.getY()));
+					enemy.stopRunning();
+					enemies.remove(enemiesIndex);
+					spaceshipBullet.stopRunning();
+					spaceshipBullets.remove(bulletsIndex);
+					bulletsIndex--;
+					break;
+				}
+			}
+		}
+	}
 
 	/**
 	 * Controls FlyingEnemy objects
