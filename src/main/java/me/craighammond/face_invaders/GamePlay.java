@@ -311,30 +311,37 @@ public class GamePlay extends Thread {
 	 * @param g
 	 */
 	private void drawLives(Graphics g) {
-		int y = 20;//y position of spaceship images
-		int x = 30;//x position of lives indicator 
-		int space = 15;//space between each spaceship
-		int halfway = (int) (SHIP_HEIGHT / 2.0);
+		int yPosOfSpaceshipImages = 20;
+		int xPosOfLivesIndicator = 30;
+		int spaceBetweenEachShip = 15;
+		int halfShipHeight = SHIP_HEIGHT / 2;
 		int lengthOfLivesLogo = 50;
 
 		g.setColor(Color.white);
-		g.drawString("Lives: ", x, y + halfway);
+		g.drawString("Lives: ", xPosOfLivesIndicator, yPosOfSpaceshipImages + halfShipHeight);
 
-		if (numExtraShips <= 3) {
-			for (int i = 0; i < numExtraShips; i++) {
-				SpaceShip.drawAShip(x + i * (SHIP_WIDTH + space)
-						+ lengthOfLivesLogo, y, SHIP_WIDTH, SHIP_HEIGHT, g);
-			}//end for
-		}//end if
+		boolean drawLivesAsMultiplier = numExtraShips > 3;
+		int numberOfShipsToDraw = drawLivesAsMultiplier ? 1 : numExtraShips;
 
-		else {
-			SpaceShip.drawAShip(x + lengthOfLivesLogo, y, SHIP_WIDTH,
-					SHIP_HEIGHT, g);
+		for (int i = 0; i < numberOfShipsToDraw; i++) {
+			SpaceShip.drawAShip(
+					xPosOfLivesIndicator + (i * (SHIP_WIDTH + spaceBetweenEachShip)) + lengthOfLivesLogo,
+					yPosOfSpaceshipImages,
+					SHIP_WIDTH,
+					SHIP_HEIGHT,
+					g
+			);
+		}
+
+		if (drawLivesAsMultiplier) {
 			g.setColor(Color.white);
-			g.drawString(" x " + numExtraShips, x + SHIP_WIDTH + space
-					+ lengthOfLivesLogo, y + halfway);
-		}//end else
-	}//end drawLives
+			g.drawString(
+					" x " + numExtraShips,
+					xPosOfLivesIndicator + SHIP_WIDTH + spaceBetweenEachShip + lengthOfLivesLogo,
+					yPosOfSpaceshipImages + halfShipHeight
+			);
+		}
+	}
 
 	/**
 	 * Deletes any bullets from spaceship that went offscreen
