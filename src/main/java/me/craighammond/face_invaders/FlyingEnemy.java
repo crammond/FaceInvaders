@@ -13,9 +13,7 @@ package me.craighammond.face_invaders;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 
-public class FlyingEnemy extends Enemy{
-	//keeps the run method running
-	private boolean isRunning;
+public class FlyingEnemy extends Enemy {
 	
 	/**
 	 * 
@@ -26,38 +24,26 @@ public class FlyingEnemy extends Enemy{
 	 */
 	public FlyingEnemy(int y, int w, int h, Image enemy) {
 		super(0-w, y, w, h, enemy, null);
-		isRunning = true;
 		r2d = new Rectangle2D.Double(xPos, yPos, width, height);
 		//sets the point value any multiple of 50 less then
 		//or equal to 5000, greater than 0
 		points = ((int)(Math.random()*10)+1)*50;
-		move();
 	}//end contructor
-	
-	//starts the run method
-	private void move(){
-		(new Thread(this)).start();
-	}//end move
 	
 	/**
 	 * shoot doesn't do anything
 	 */
 	public void shoot(){}//end move
-	
-	public void run(){
-		while(isRunning){
+
+	private int stepCount = 0;
+	private final static int WAIT_MILLI = 15;
+	public void step(){
+		if (stepCount == WAIT_MILLI) {
 			xPos++;
 			r2d = new Rectangle2D.Double(xPos, yPos, width, height);
-			try {
-				Thread.sleep(15);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (xPos==800){
-				isRunning = false;
-			}//end if
-		}//end while
-	}//end run
+		} else {
+			stepCount++;
+		}
+	}
 
-}//end FlyingEnemy
+}

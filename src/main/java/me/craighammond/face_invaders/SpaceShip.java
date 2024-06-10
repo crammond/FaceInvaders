@@ -20,7 +20,7 @@ import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
-public class SpaceShip extends Thread implements KeyListener{
+public class SpaceShip implements KeyListener {
 
 	//Ship Coordinates
 	private int xPos;
@@ -42,9 +42,6 @@ public class SpaceShip extends Thread implements KeyListener{
 	//Ship shooting
 	private boolean shootBoolean;
 	
-	//Thread boolean
-	private boolean keepRunning;
-	
 	//Images
 	private static Image spaceShipImage;
 	private Image bulletImage;
@@ -65,7 +62,6 @@ public class SpaceShip extends Thread implements KeyListener{
 	 * 
 	 * @param x desired initial x position of spaceship
 	 * @param y desired initial y position of spaceship
-	 * @param l desired length of spaceship
 	 * @param w desired width of spaceship
 	 * @param ship image of the ship
 	 */
@@ -90,10 +86,6 @@ public class SpaceShip extends Thread implements KeyListener{
 		
 		spaceShipImage = ship;
 		bulletImage = shipBullet;
-		
-		keepRunning = true;
-		
-		start();
 	}
 
 	// Getters
@@ -153,13 +145,6 @@ public class SpaceShip extends Thread implements KeyListener{
 		}//end if
 	}//end shoot
 	
-	/**
-	 * Stops the running thread
-	 */
-	public void stopRunning(){
-		keepRunning = false;
-	}//end stopRunning
-	
 	public void stopShooting(){
 		shipFireWait=0;
 	}//end stopShooting
@@ -205,34 +190,28 @@ public class SpaceShip extends Thread implements KeyListener{
 	
 	public void keyTyped(KeyEvent e) {}
 
-	@Override
-	public void run() {
-		while(keepRunning){
-			if(goRight&&xPos<=800-width){
+	private int stepCount = 0;
+	private final static int WAIT_MILLI = 4;
+	public void step() {
+		if (stepCount == WAIT_MILLI) {
+			if (goRight && xPos <= 800 - width) {
 				xPos++;
-			}//end if
-			if(goLeft&&xPos>=0){
-				xPos--;
-			}//end if
-			if(shootBoolean){
-				shoot();
-			}//end if
-			
-			r2d = new Rectangle2D.Double(xPos, yPos, width, height);
-			
-			if(shipFireWait<SHIP_FIRE_WAIT_TIME){
-				shipFireWait++;
-			}//end if
-			
-			try {
-				Thread.sleep(4);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-		}//end while
-		
-		//System.out.println("ended ship");
-	}//end run
+			if (goLeft && xPos >= 0) {
+				xPos--;
+			}
+			if (shootBoolean) {
+				shoot();
+			}
+
+			r2d = new Rectangle2D.Double(xPos, yPos, width, height);
+
+			if (shipFireWait < SHIP_FIRE_WAIT_TIME) {
+				shipFireWait++;
+			}
+		} else {
+			stepCount++;
+		}
+	}
 
 }//end SpaceShip

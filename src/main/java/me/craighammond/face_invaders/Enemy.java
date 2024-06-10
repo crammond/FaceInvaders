@@ -13,7 +13,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 
-public class Enemy extends Thread {
+public class Enemy {
 	//Enemy coordinates
 	protected int xPos;
 	protected int yPos;
@@ -27,9 +27,6 @@ public class Enemy extends Thread {
 	
 	//is true if the Enemy is moving to the right
 	private boolean isMovingRight;
-	
-	//keeps the run method going
-	private boolean keepRunning;
 	
 	protected Rectangle2D r2d;
 	
@@ -64,10 +61,6 @@ public class Enemy extends Thread {
 		
 		enemyImage = enemy;
 		bulletImage = enemyBullet;
-		
-		keepRunning = true;
-		
-		start();
 	}
 
 	// End Getters
@@ -114,12 +107,9 @@ public class Enemy extends Thread {
 	 * sets this Enemy's Bullet
 	 * equal to null
 	 */
-	public void makeBulletNull(){
-		if(bullet!=null){
-			bullet.stopRunning();
-			bullet = null;
-		}//end if
-	}//end MakeBulletNull
+	public void makeBulletNull() {
+		bullet = null;
+	}
 	
 	/**
 	 * set's this Enemy's Bullet
@@ -131,44 +121,30 @@ public class Enemy extends Thread {
 			bullet = new Bullet(xPos + (int)(width/2.0-Bullet.WIDTH/2.0), yPos + height, false,  bulletImage);
 		}//end if
 	}//end shoot
-	
-	/**
-	 * stops the run method
-	 */
-	public void stopRunning(){
-		keepRunning = false;
-	}//end stopRunning
 
-	@Override
-	public void run() {
-		while (keepRunning) {
+	private int stepCount = 0;
+	private final static int WAIT_MILLI = 750;
+	public void step() {
+		if (stepCount == WAIT_MILLI) {
 			if (isMovingRight) {
 				xPos += MOVE_COUNT;
 				count++;
 				if (count == 8) {
 					isMovingRight = false;
 				}//end if
-			}//end if
-
-			else {
+			} else {
 				xPos -= MOVE_COUNT;
 				count--;
 				if (count == 0) {
 					isMovingRight = true;
-				}//end if
-			}//end else
+				}
+			}
 
 			r2d = new Rectangle2D.Double(xPos, yPos, width, height);
-			
-			try {
-				Thread.sleep(750);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}//end while
-		
-		//System.out.println("ended enemy");
-	}//end run
+			stepCount = 0;
+		} else {
+			stepCount++;
+		}
+	}
 
-}//end Enemy
+}

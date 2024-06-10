@@ -13,7 +13,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 
-public class Bullet extends Thread{
+public class Bullet {
 	//Bullet Coordinates
 	private int xPos;
 	private int yPos;
@@ -26,8 +26,6 @@ public class Bullet extends Thread{
 	
 	//Decides direction
 	private boolean directionIsUp;
-	//keeps the runMethod going
-	private boolean keepRunning;
 	
 	//image of the Bullet
 	private Image bulletImage;
@@ -45,8 +43,6 @@ public class Bullet extends Thread{
 		r2d = new Rectangle2D.Double(xPos, yPos, WIDTH, HEIGHT);
 		directionIsUp = isUp;
 		bulletImage = ofBullet;
-		keepRunning = true;
-		start();
 	}//end constructor
 
 	// Getters
@@ -60,10 +56,6 @@ public class Bullet extends Thread{
 	
 	public Rectangle2D getRectangle2D(){
 		return r2d;
-	}
-	
-	public boolean isRunning(){
-		return keepRunning;
 	}
 
 	// End Getters
@@ -99,32 +91,18 @@ public class Bullet extends Thread{
 	public boolean hits (SpaceShip s){
 		return r2d.intersects(s.getRectangle2D());
 	}//end hits
-	
-	/**
-	 * stops the run method
-	 */
-	public void stopRunning(){
-		keepRunning = false;
-	}//end stopRunning
 
-	@Override
-	public void run() {
-		//moves the bullet
-		while(keepRunning){
-			if(directionIsUp)
+	private int stepCount = 0;
+	private final static int WAIT_MILLI = 3;
+	public void step() {
+		if (stepCount == WAIT_MILLI) {
+			if (directionIsUp)
 				yPos--;
 			else yPos++;
 			r2d = new Rectangle2D.Double(xPos, yPos, WIDTH, HEIGHT);
-			
-			try {
-				Thread.sleep(3);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}//end while
-		
-		
-		//System.out.println("ended bullet");
-	}//end run
-}//end Bullet
+			stepCount = 0;
+		} else {
+			stepCount++;
+		}
+	}
+}

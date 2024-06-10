@@ -20,6 +20,7 @@ import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GamePlay extends Thread {
 	// Applet Constants
@@ -351,7 +352,6 @@ public class GamePlay extends Thread {
 		if (spaceship != null) {
 			for (int i = 0; i < spaceship.getBullets().size(); i++) {
 				if (spaceship.getBullets().get(i).getY() < -Bullet.HEIGHT) {
-					spaceship.getBullets().get(i).stopRunning();
 					spaceship.getBullets().remove(i);
 				}// end if
 			}// end for
@@ -360,7 +360,6 @@ public class GamePlay extends Thread {
 		//deletes the offscreen bullets saved from dead ships
 		for (int i = 0; i < savedShipBullets.size(); i++) {
 			if (savedShipBullets.get(i).getY() < -Bullet.HEIGHT) {
-				savedShipBullets.get(i).stopRunning();
 				savedShipBullets.remove(i);
 			}// end if
 		}// end for
@@ -382,7 +381,6 @@ public class GamePlay extends Thread {
 		for (int i = 0; i < savedEnemyBullets.size(); i++) {
 			if (savedEnemyBullets.get(i) != null
 					&& savedEnemyBullets.get(i).getY() > Y_MAX) {
-				savedEnemyBullets.get(i).stopRunning();
 				savedEnemyBullets.remove(i);
 			}// end if
 		}// end for
@@ -421,7 +419,6 @@ public class GamePlay extends Thread {
 		for (int i = 0; i < savedEnemyBullets.size(); i++) {
 			Bullet enemyBullet = savedEnemyBullets.get(i);
 			if (handleShipCollisionForBullet(enemyBullet)) {
-				enemyBullet.stopRunning();
 				savedEnemyBullets.remove(i);
 				break;
 			}
@@ -433,7 +430,6 @@ public class GamePlay extends Thread {
 			explosions.add(new Explosion(enemyBullet.getX(), enemyBullet.getY() + Bullet.HEIGHT));
 			setSavedShipBullets();
 			boom.play();
-			spaceship.stopRunning();
 			spaceship = null;
 			return true;
 		}
@@ -472,9 +468,7 @@ public class GamePlay extends Thread {
 					}
 					boom.play();
 					explosions.add(new Explosion(spaceshipBullet.getX(), spaceshipBullet.getY()));
-					enemy.stopRunning();
 					enemies.remove(enemiesIndex);
-					spaceshipBullet.stopRunning();
 					spaceshipBullets.remove(bulletsIndex);
 					bulletsIndex--;
 					break;
@@ -493,8 +487,8 @@ public class GamePlay extends Thread {
 		for (int i = 0; i < enemies.size(); i++) {
 			if (enemies.get(i) instanceof FlyingEnemy) {
 				if (enemies.get(i).getX() >= 800){
-					enemies.get(i).stopRunning();
 					enemies.remove(i);
+					break;
 				}//end if
 				else
 					canAdd = false;
@@ -502,7 +496,7 @@ public class GamePlay extends Thread {
 		}//end for
 
 		//only adds if the screen has other enemies on it
-		if (enemies.size() == 0) {
+		if (enemies.isEmpty()) {
 			canAdd = false;
 		}//end if
 		
@@ -621,6 +615,18 @@ public class GamePlay extends Thread {
 
 			deleteLostSpaceShipBullet();
 			deleteLostEnemyBullets();
+
+			Optional.ofNullable(savedEnemyBullets).ifPresent(bullets -> bullets.forEach(Bullet::step));
+			Optional.ofNullable(savedShipBullets).ifPresent(bullets -> bullets.forEach(Bullet::step));
+			Optional.ofNullable(spaceship).ifPresent(it -> {
+				it.step();
+				it.getBullets().forEach(Bullet::step);
+			});
+			Optional.ofNullable(enemies).ifPresent(them -> them.forEach(enemy -> {
+                enemy.step();
+				Optional.ofNullable(enemy.getBullet()).ifPresent(Bullet::step);
+            }));
+			Optional.ofNullable(explosions).ifPresent(them -> them.forEach(Explosion::step));
 
 			manageFlyingEnemies();
 
